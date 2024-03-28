@@ -1,8 +1,22 @@
-# Ultimaker Cura v5.x QIDI X-CF Pro Plugin
+# QidiPrint Plugin for Ultimaker Cura 5.x
 
-## Plugin for Ultimaker Cura v5.x that allows monitoring and printing on QIDI X-CF Pro over network
+## Plugin for Ultimaker Cura v5.x that allows monitoring and printing on QIDI Printers over network, Supports webcams
 
-This plugin is completely based on the great work of [Aleksey Sokolov](https://github.com/alkaes). Original source is [here](https://github.com/alkaes/QidiPrint).
+This plugin is based on the great work of [Aleksey Sokolov](https://github.com/alkaes) and the fork adapted for 5.x by [Nick Kuvyrkin](https://github.com/nkuvyrkin). Original sources are [here](https://github.com/alkaes/QidiPrint) and [here](https://github.com/nkuvyrkin/Ultimaker-Cura-v5.x-QIDI-X-CF-Pro-Plugin).
+
+Should be working with the following printers, their definitions have been aggregated from the two sources mentioned before.
+
+* Qidi Tech X-Maker
+* Qidi Tech X-Max
+* Qidi Tech X-One2
+* Qidi Tech X-Plus
+* Qidi Tech X-Pro
+* Qidi Tech X-Smart
+* QiDi Tech X-CF Pro
+
+__Plugin has up to date only been tested using Cura 5.6.0 on Microsoft Windows printing to a Qidi X-Max.__
+
+## ToBeUpdated
 
 ## Print menu button
 ![Screenshot of the printer menu entry](screenshots/SendToXCFPro.png)
