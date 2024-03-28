@@ -36,7 +36,7 @@ class OutputStage(Enum):
 class QidiPrintOutputDevice(PrinterOutputDevice):
     printerStatusChanged = pyqtSignal()
 
-    def __init__(self, name, address):
+    def __init__(self, name, address, webcam):
         super().__init__(name, connection_type=ConnectionType.NetworkConnection)
         self.setShortDescription(catalog.i18nc("@action:button Preceded by 'Ready to'.", "Send to " + name))
         self.setDescription(catalog.i18nc("@info:tooltip",  "Send to " + name))
@@ -45,6 +45,7 @@ class QidiPrintOutputDevice(PrinterOutputDevice):
         self.setIconName("print")
         self._properties = {}
         self._address = address
+        self._webcam = webcam
         self._PluginName = 'QIDI Print'
         self.setPriority(3)
 
@@ -76,6 +77,7 @@ class QidiPrintOutputDevice(PrinterOutputDevice):
 
         Logger.log("d", self._name + " | New QidiPrintOutputDevice created")
         Logger.log("d", self._name + " | IP: " + self._address)
+        Logger.log("d", self._name + " | WEBCAM: " + self._webcam)
 
         if hasattr(self, '_message'):
             self._message.hide()
@@ -93,6 +95,12 @@ class QidiPrintOutputDevice(PrinterOutputDevice):
             # Ensure that a printer is created.
             printer = PrinterOutputModel(output_controller=self._output_controller, number_of_extruders=num_extruders, firmware_version=self.firmwareVersion)
             printer.updateName(container_stack.getName())
+            # set webcam
+            if self._webcam != "":
+                printer.setCameraUrl(QUrl(self._webcam))
+            else:
+                printer.setCameraUrl(QUrl())
+            # add to printers
             self._printers = [printer]
             self.setConnectionState(ConnectionState.Connected)
             self.printersChanged.emit()
@@ -382,6 +390,10 @@ class QidiPrintOutputDevice(PrinterOutputDevice):
 
     def getFirmwareName(self):
         return self._qidi._firmware_ver
+
+    @pyqtProperty(str, notify=printerStatusChanged)
+    def webcam(self):
+        return self._webcam
 
     @pyqtProperty(str, notify=printerStatusChanged)
     def xPosition(self) -> bool:

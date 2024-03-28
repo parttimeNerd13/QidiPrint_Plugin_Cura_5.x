@@ -16,7 +16,7 @@ Item
     Connections
     {
         target: Cura.MachineManager
-        onGlobalContainerChanged:
+        function onGlobalContainerChanged()
         {
             outputDevice = Cura.MachineManager.printerOutputDevices.length >= 1 ? Cura.MachineManager.printerOutputDevices[0] : null;
         }
@@ -41,11 +41,34 @@ Item
         UM.Label
         {
             id: outputDeviceAddressLabel
-            text: (outputDevice != null && outputDevice.address != null) ? "IP:" + outputDevice.address : ""
+            text: (outputDevice != null && outputDevice.address != null) ? "IP: " + outputDevice.address : ""
             font: UM.Theme.getFont("default_bold")
             color: UM.Theme.getColor("text_inactive")
             anchors.top: outputDeviceNameLabel.bottom
             anchors.left: parent.left
+            anchors.margins: UM.Theme.getSize("default_margin").width
+        }
+
+        UM.Label
+        {
+            id: outputDeviceWebcamLabel
+            text: (outputDevice != null && outputDevice.address != null && outputDevice.webcam != null && outputDevice.webcam != "") ? "          Webcam:" : ""
+            font: UM.Theme.getFont("default_bold")
+            color: UM.Theme.getColor("text_inactive")
+            anchors.top: outputDeviceNameLabel.bottom
+            anchors.left: outputDeviceAddressLabel.right
+            anchors.margins: UM.Theme.getSize("default_margin").width
+        }
+
+        UM.Label
+        {
+            id: outputDeviceWebcamLink
+            text: (outputDevice != null && outputDevice.address != null && outputDevice.webcam != null && outputDevice.webcam != "") ? '<html><a href="' + outputDevice.webcam + '">' + outputDevice.webcam + '</a></html>' : ""
+            onLinkActivated: Qt.openUrlExternally(link)
+            font: UM.Theme.getFont("default_bold")
+            color: UM.Theme.getColor("text_inactive")
+            anchors.top: outputDeviceNameLabel.bottom
+            anchors.left: outputDeviceWebcamLabel.right
             anchors.margins: UM.Theme.getSize("default_margin").width
         }
     }

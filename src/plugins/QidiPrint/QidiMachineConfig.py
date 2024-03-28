@@ -22,6 +22,7 @@ class QidiMachineConfig(MachineAction):
 
         self._application = CuraApplication.getInstance()
         self._network_plugin = None
+        self._webcam = ""
 
         self.__additional_components_context = None
         self.__additional_component = None
@@ -49,13 +50,13 @@ class QidiMachineConfig(MachineAction):
         if self._network_plugin:
             self._network_plugin.removePrinter(key)
 
-    @pyqtSlot(str, str, str)
-    def setManualPrinter(self, oldName, name, address):
+    @pyqtSlot(str, str, str, str)
+    def setManualPrinter(self, oldName, name, address, webcam):
         if oldName != "":
             # This manual printer replaces a current manual printer
             self._network_plugin.removePrinter(oldName)
         if address != "":
-            self._network_plugin.addPrinter(name, address)
+            self._network_plugin.addPrinter(name, address, webcam)
 
     @pyqtSlot(str, str, result = bool)
     def validName(self, oldName, newName):
@@ -125,3 +126,6 @@ class QidiMachineConfig(MachineAction):
         if isinstance(container, DefinitionContainer) and container.getMetaDataEntry("type") == "machine" and container.getMetaDataEntry("manufacturer") == 'Qidi':
             self._application.getMachineActionManager().addSupportedAction(container.getId(), self.getKey())
 
+    @pyqtProperty(str)
+    def webcam(self) -> str:
+        return self._webcam

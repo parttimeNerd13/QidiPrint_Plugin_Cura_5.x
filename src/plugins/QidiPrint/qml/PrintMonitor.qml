@@ -13,15 +13,13 @@ Item
     id: base
     UM.I18nCatalog { id: catalog; name: "cura"}
 
-    function showTooltip(item, position, text)
-    {
+    function showTooltip(item, position, text) {
         tooltip.text = text;
         position = item.mapToItem(base, position.x - UM.Theme.getSize("default_arrow").width, position.y);
         tooltip.show(position);
     }
 
-    function hideTooltip()
-    {
+    function hideTooltip() {
         tooltip.hide();
     }
 
@@ -29,8 +27,7 @@ Item
         return (new Array(length + 1).join(pad) + string).slice(-length);
     }
 
-    function getPrettyTime(time)
-    {
+    function getPrettyTime(time) {
         var hours = Math.floor(time / 3600)
         time -= hours * 3600
         var minutes = Math.floor(time / 60);
@@ -45,139 +42,150 @@ Item
     property var activePrinter: connectedDevice != null ? connectedDevice.activePrinter : null
     property var activePrintJob: activePrinter != null ? activePrinter.activePrintJob: null
 
-    Column
-    {
-        id: printMonitor
+    Rectangle {
+        id: outerFrame
 
         anchors.fill: parent
 
         property var extrudersModel: CuraApplication.getExtrudersModel()
 
-        OutputDeviceHeader
-        {
+        OutputDeviceHeader {
+            id: header
             outputDevice: connectedDevice
         }
 
-        HeatedBedBox
-        {
-            visible:
-            {
-                if(activePrinter != null && activePrinter.bedTemperature != -1)
-                {
-                    return true
-                }
-                return false
-            }
-            printerModel: activePrinter
-        }
+        Rectangle {
+            id: innerFrame
 
-        Rectangle
-        {
-            color: UM.Theme.getColor("wide_lining")
-            width: parent.width
-            height: UM.Theme.getSize("thick_lining").width
-        }
+            anchors.top: header.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
 
-        Rectangle
-        {
-            color: UM.Theme.getColor("wide_lining")
-            width: parent.width
-            height: childrenRect.height
+            clip: true
 
-            Flow
-            {
-                id: extrudersGrid
-                spacing: UM.Theme.getSize("thick_lining").width
-                width: parent.width
+            Rectangle {               
+                anchors.left: parent.left
+                anchors.right: vbar.left
 
-                Repeater
-                {
-                    id: extrudersRepeater
-                    model: activePrinter != null ? activePrinter.extruders : null
+                y: -vbar.position * vbar.height
 
-                    ExtruderBox
-                    {
-                        color: UM.Theme.getColor("main_background")
-                        width: index == machineExtruderCount.properties.value - 1 && index % 2 == 0 ? extrudersGrid.width : Math.round(extrudersGrid.width / 2 - UM.Theme.getSize("thick_lining").width / 2)
-                        extruderModel: modelData
+                Column {
+                    id: content
+
+                    HeatedBedBox {
+                        visible:
+                        {
+                            if(activePrinter != null && activePrinter.bedTemperature != -1)
+                            {
+                                return true
+                            }
+                            return false
+                        }
+                        printerModel: activePrinter
+                    }
+
+                    Rectangle {
+                        color: UM.Theme.getColor("wide_lining")
+                        width: parent.width
+                        height: childrenRect.height
+
+                        Flow {
+                            id: extrudersGrid
+                            spacing: UM.Theme.getSize("thick_lining").width
+                            width: parent.width
+
+                            Repeater {
+                                id: extrudersRepeater
+                                model: activePrinter != null ? activePrinter.extruders : null
+
+                                ExtruderBox {
+                                    color: UM.Theme.getColor("main_background")
+                                    width: index == machineExtruderCount.properties.value - 1 && index % 2 == 0 ? extrudersGrid.width : Math.round(extrudersGrid.width / 2 - UM.Theme.getSize("thick_lining").width / 2)
+                                    extruderModel: modelData
+                                }
+                            }
+                        }
+                    }
+
+                    UM.SettingPropertyProvider {
+                        id: bedTemperature
+                        containerStack: Cura.MachineManager.activeMachine
+                        key: "material_bed_temperature"
+                        watchedProperties: ["value", "minimum_value", "maximum_value", "resolve"]
+                        storeIndex: 0
+
+                        property var resolve: Cura.MachineManager.activeStack != Cura.MachineManager.activeMachine ? properties.resolve : "None"
+                    }
+
+                    UM.SettingPropertyProvider {
+                        id: machineExtruderCount
+                        containerStack: Cura.MachineManager.activeMachine
+                        key: "machine_extruder_count"
+                        watchedProperties: ["value"]
+                    }
+
+                    ManualPrinterControl {
+                        printerModel: activePrinter
+                        visible: activePrinter != null ? activePrinter.canControlManually : false
+                    }
+
+                    MonitorSection {
+                        label: catalog.i18nc("@label", "Active print")
+                        width: base.width
+                        visible: activePrintJob != null
+                    }
+
+                    MonitorItem {
+                        label: catalog.i18nc("@label", "Job Name")
+                        value: activePrintJob != null ? activePrintJob.name : ""
+                        width: base.width
+                        visible: activePrintJob != null
+                    }
+
+                    MonitorItem {
+                        label: catalog.i18nc("@label", "Elapsed Time")
+                        value: activePrintJob != null ? getPrettyTime(activePrintJob.timeElapsed) : ""
+                        width: base.width
+                        visible: activePrintJob != null
+                    }
+
+                    MonitorItem {
+                        label: catalog.i18nc("@label", "Estimated time left")
+                        value: activePrintJob != null ? getPrettyTime(activePrintJob.timeTotal - activePrintJob.timeElapsed) : ""
+                        visible:
+                        {
+                            return false;
+                            if(activePrintJob == null)
+                            {
+                                return false
+                            }
+
+                            return (activePrintJob.state == "printing" ||
+                                    activePrintJob.state == "resuming" ||
+                                    activePrintJob.state == "pausing" ||
+                                    activePrintJob.state == "paused")
+                        }
+                        width: base.width
                     }
                 }
             }
-        }
 
-        UM.SettingPropertyProvider
-        {
-            id: bedTemperature
-            containerStack: Cura.MachineManager.activeMachine
-            key: "material_bed_temperature"
-            watchedProperties: ["value", "minimum_value", "maximum_value", "resolve"]
-            storeIndex: 0
-
-            property var resolve: Cura.MachineManager.activeStack != Cura.MachineManager.activeMachine ? properties.resolve : "None"
-        }
-
-        UM.SettingPropertyProvider
-        {
-            id: machineExtruderCount
-            containerStack: Cura.MachineManager.activeMachine
-            key: "machine_extruder_count"
-            watchedProperties: ["value"]
-        }
-
-        ManualPrinterControl
-        {
-            printerModel: activePrinter
-            visible: activePrinter != null ? activePrinter.canControlManually : false
-        }
-
-
-        MonitorSection
-        {
-            label: catalog.i18nc("@label", "Active print")
-            width: base.width
-            visible: activePrintJob != null
-        }
-
-
-        MonitorItem
-        {
-            label: catalog.i18nc("@label", "Job Name")
-            value: activePrintJob != null ? activePrintJob.name : ""
-            width: base.width
-            visible: activePrintJob != null
-        }
-
-        MonitorItem
-        {
-            label: catalog.i18nc("@label", "Elapsed Time")
-            value: activePrintJob != null ? getPrettyTime(activePrintJob.timeElapsed) : ""
-            width: base.width
-            visible: activePrintJob != null
-        }
-
-        MonitorItem
-        {
-            label: catalog.i18nc("@label", "Estimated time left")
-            value: activePrintJob != null ? getPrettyTime(activePrintJob.timeTotal - activePrintJob.timeElapsed) : ""
-            visible:
-            {
-                return false;
-                if(activePrintJob == null)
-                {
-                    return false
-                }
-
-                return (activePrintJob.state == "printing" ||
-                        activePrintJob.state == "resuming" ||
-                        activePrintJob.state == "pausing" ||
-                        activePrintJob.state == "paused")
+            ScrollBar {
+                id: vbar
+                hoverEnabled: true
+                active: hovered || pressed
+                policy: content.height > innerFrame.height ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
+                orientation: Qt.Vertical
+                size: (innerFrame.height / content.height)
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
             }
-            width: base.width
         }
     }
 
-    Cura.PrintSetupTooltip
-    {
+    Cura.PrintSetupTooltip {
         id: tooltip
     }
 }

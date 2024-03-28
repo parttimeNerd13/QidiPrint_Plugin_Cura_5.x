@@ -9,6 +9,8 @@ import "."
 
 Component
 {
+    id: monitorItem
+
     Item
     {
         UM.I18nCatalog { id: catalog; name: "cura"}
@@ -17,6 +19,75 @@ Component
 
         Rectangle
         {
+            id: mainPanel
+
+            color: UM.Theme.getColor("main_background")
+
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+                left: parent.left
+                right: sidebarPanel.left
+                rightMargin: UM.Theme.getSize("default_margin").width
+            }
+
+            UM.Label {
+                id: cameraLabel
+
+                anchors {
+                    horizontalCenter: parent.horizontalCenter;
+                    verticalCenter: parent.verticalCenter;
+                }
+                color: UM.Theme.getColor(OutputDevice.activePrinter != null && OutputDevice.activePrinter.cameraUrl != null && OutputDevice.activePrinter.cameraUrl != "" ? "text" : "text_inactive")
+                font: UM.Theme.getFont("large_bold")
+                text: OutputDevice.activePrinter != null && OutputDevice.activePrinter.cameraUrl != null && OutputDevice.activePrinter.cameraUrl != "" ? "Camera" : "Camera not configured"
+            }
+            UM.Label {                
+                id: cameraLabelUrl
+
+                visible: OutputDevice.activePrinter != null && OutputDevice.activePrinter.cameraUrl != null && OutputDevice.activePrinter.cameraUrl != ""
+                anchors {
+                    horizontalCenter: cameraLabel.horizontalCenter;
+                    top: cameraLabel.bottom;
+                }
+                color: UM.Theme.getColor("text_inactive")
+                font: UM.Theme.getFont("small")
+                text: "Url: " + (OutputDevice.activePrinter != null && OutputDevice.activePrinter.cameraUrl != null ? OutputDevice.activePrinter.cameraUrl : "Null")
+            }
+
+            Cura.NetworkMJPGImage { 
+                property real scale: Math.min(Math.min((parent.width - 6 * UM.Theme.getSize("default_margin").width) / imageWidth, (parent.height - 6 * UM.Theme.getSize("default_margin").height) / imageHeight), 2);
+
+                id: cameraImage;
+                anchors {
+                    horizontalCenter: parent.horizontalCenter;
+                    verticalCenter: parent.verticalCenter;
+                }
+                width: Math.floor(imageWidth * scale)
+                height: Math.floor(imageHeight * scale)
+                source: OutputDevice.activePrinter != null && OutputDevice.activePrinter.cameraUrl != null ? OutputDevice.activePrinter.cameraUrl : ""
+                onVisibleChanged: {
+                    if (visible) {
+                        if (OutputDevice.activePrinter != null && OutputDevice.activePrinter.cameraUrl != null) {
+                            cameraImage.start();
+                        }
+                    } else {
+                        if (OutputDevice.activePrinter != null && OutputDevice.activePrinter.cameraUrl != null) {
+                            cameraImage.stop();
+                        }
+                    }
+                }
+                Component.onCompleted: {
+                    if (OutputDevice.activePrinter != null && OutputDevice.activePrinter.cameraUrl != null) {
+                        cameraImage.start();
+                    }
+                }
+            }
+        }
+
+        Rectangle
+        {
+            id: sidebarPanel
 
             color: UM.Theme.getColor("main_background")
 
@@ -43,18 +114,25 @@ Component
                 }                
             }
 
-            PrintMonitor
-            {
-                visible:
+            Rectangle{
+                anchors.top: parent.top
+                anchors.bottom: footerSeparator.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                
+                PrintMonitor
                 {
-                    if(activePrinter != null)
+                    visible:
                     {
-                        return activePrinter.state != "offline"
-                    }
-                    return false                
-                    
-                }                
-                anchors.fill: parent
+                        if(activePrinter != null)
+                        {
+                            return activePrinter.state != "offline"
+                        }
+                        return false                
+                        
+                    }                
+                    anchors.fill: parent
+                }
             }
 
             Rectangle

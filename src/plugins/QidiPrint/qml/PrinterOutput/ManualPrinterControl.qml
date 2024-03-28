@@ -43,14 +43,12 @@ Item
             return true;
         }
 
-        Row
+        Rectangle
         {
             width: base.width - 2 * UM.Theme.getSize("default_margin").width
             height: childrenRect.height + UM.Theme.getSize("default_margin").width
             anchors.left: parent.left
             anchors.leftMargin: UM.Theme.getSize("default_margin").width
-
-            spacing: UM.Theme.getSize("default_margin").width
 
             UM.Label
             {
@@ -417,14 +415,12 @@ Item
             }
         }
 
-        Row
+        Rectangle
         {
             width: base.width - 2 * UM.Theme.getSize("default_margin").width
             height: childrenRect.height + UM.Theme.getSize("default_margin").width
             anchors.left: parent.left
             anchors.leftMargin: UM.Theme.getSize("default_margin").width
-
-            spacing: UM.Theme.getSize("default_margin").width
 
             UM.Label
             {

@@ -93,7 +93,7 @@ Cura.MachineAction
                 text: catalog.i18nc("@action:button", "Add");
                 onClicked:
                 {
-                    manualPrinterDialog.showDialog("", "");
+                    manualPrinterDialog.showDialog("", "", "");
                 }
             }
 
@@ -103,7 +103,7 @@ Cura.MachineAction
                 text: catalog.i18nc("@action:button", "Edit")
                 onClicked:
                 {
-                    manualPrinterDialog.showDialog(base.selectedPrinter.name, base.selectedPrinter.address);
+                    manualPrinterDialog.showDialog(base.selectedPrinter.name, base.selectedPrinter.address, base.selectedPrinter.webcam);
                 }
                 enabled : (base.selectedPrinter != null && base.selectedPrinter && base.selectedPrinter.status == "Closed")
             }
@@ -261,6 +261,18 @@ Cura.MachineAction
                     {
                         width: Math.round(parent.width * 0.5)
                         wrapMode: Text.WordWrap
+                        text: catalog.i18nc("@label", "Webcam")
+                    }
+                    UM.Label
+                    {
+                        width: Math.round(parent.width * 0.5)
+                        wrapMode: Text.WordWrap
+                        text: base.selectedPrinter ? base.selectedPrinter.webcam : ""
+                    }
+                    UM.Label
+                    {
+                        width: Math.round(parent.width * 0.5)
+                        wrapMode: Text.WordWrap
                         text: catalog.i18nc("@label", "Status")
                     }
                     UM.Label
@@ -323,6 +335,7 @@ Cura.MachineAction
     UM.Dialog
     {
         id: manualPrinterDialog
+        property alias webcamText: webcamField.text //added by RR
         property alias addressText: addressField.text
         property alias nameFieldText: nameField.text
         property string oldName: ""
@@ -331,26 +344,28 @@ Cura.MachineAction
         title: catalog.i18nc("@title:window", "Add Qidi Printer")
 
         minimumWidth: 420 * screenScaleFactor
-        minimumHeight: 230 * screenScaleFactor
+        minimumHeight: 300 * screenScaleFactor
         width: minimumWidth
         height: minimumHeight
 
-        signal showDialog(string name, string address)
+        signal showDialog(string name, string address, string webcam)
         onShowDialog:
         {
             nameFieldText = name
             oldName = name
             addressText = address;
+            webcamText = webcam
             addressField.selectAll();
             addressField.focus = true;
             manualPrinterDialog.show();
             nameField.textChanged();
             addressField.textChanged();
+            webcamField.textChanged();
         }
 
         onAccepted:
         {
-            manager.setManualPrinter(oldName, nameFieldText, addressText)
+            manager.setManualPrinter(oldName, nameFieldText, addressText, webcamText)
         }
 
         Column {
@@ -388,6 +403,21 @@ Cura.MachineAction
                 {
                     regularExpression: /^((?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){0,3}(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$/
                 }
+                onAccepted: btnOk.clicked()
+            }
+
+            UM.Label
+            {
+                text: catalog.i18nc("@alabel","Enter the webcam address of your printer. (optional)")
+                width: parent.width
+                wrapMode: Text.WordWrap
+            }
+
+            Cura.TextField
+            {
+                id: webcamField
+                width: parent.width
+                maximumLength: 80
                 onAccepted: btnOk.clicked()
             }
         }

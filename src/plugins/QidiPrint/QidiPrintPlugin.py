@@ -107,11 +107,11 @@ class QidiPrintPlugin(QObject, OutputDevicePlugin):
     def _loadConfiguration(self):
         for name, instance in self._instances.items():
             if 'ip' in instance.keys():
-                self.addPrinter(name, instance['ip'])
+                self.addPrinter(name, instance['ip'], instance['webcam'])
 
     def _discoveredDevices(self):
         for device in self._scan_job.devices:
-            self.addPrinter(device.name, device.ipaddr)
+            self.addPrinter(device.name, device.ipaddr, "")
 
     def start(self):
         self._loadConfiguration()
@@ -155,7 +155,7 @@ class QidiPrintPlugin(QObject, OutputDevicePlugin):
                     Logger.log("d", "Closing connection [%s]..." % key)
                     self._printers[key].connectionStateChanged.disconnect(self._onPrinterConnectionStateChanged)
 
-    def addPrinter(self, name, address):
+    def addPrinter(self, name, address, webcam):
         if name in self._printers:  # Is the printer already in the list?
             return
 
@@ -166,13 +166,13 @@ class QidiPrintPlugin(QObject, OutputDevicePlugin):
 
         # add to cura config
         if name not in self._instances.keys():
-            self._instances[name] = {"ip": address}
+            self._instances[name] = {"ip": address, "webcam": webcam}
             self._preferences.setValue("QidiPrint/instances", json.dumps(self._instances))
 
         # Check if printer instance is already in OutputDeviceManager
         printer = self.getOutputDeviceManager().getOutputDevice(name)
         if not printer:
-            printer = QidiPrintOutputDevice.QidiPrintOutputDevice(name, address)
+            printer = QidiPrintOutputDevice.QidiPrintOutputDevice(name, address, webcam)
         self._printers[name] = printer
         self.printerListChanged.emit()
 
