@@ -6,6 +6,7 @@ This plugin is based on the great work of [Aleksey Sokolov](https://github.com/a
 
 Should be working with the following printers, their definitions have been aggregated from the two sources mentioned before.
 
+* Qidi Tech 1
 * Qidi Tech X-Maker
 * Qidi Tech X-Max
 * Qidi Tech X-One2
