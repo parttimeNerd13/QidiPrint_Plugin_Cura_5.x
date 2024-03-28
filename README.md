@@ -20,7 +20,7 @@ __Plugin has up to date only been tested using Cura 5.6.0 on Microsoft Windows p
 ## ToBeUpdated
 
 ## Print menu button
-![Screenshot of the printer menu entry](screenshots/SendToXCFPro.png)
+![Screenshot of the printer menu entry](screenshots/SendToXMAX.png)
 ## Printer Monitor (idle)
 ![Screenshot of the printer menu entry](screenshots/printerMonitorIdle.png)
 ## Printer Monitor (printing)
@@ -59,6 +59,10 @@ QIDI printers are configured through the extension menu bar:
 * A new window will pop-up with detected printers list (you also can add them manually by pressing the Add button)
 
 ![Screenshot of the discovery dialog](screenshots/QidiPrint.png)
+
+* While adding a new printer manually (or by pressing Edit) the address of a webcam inside the printer (has to be added seperatly) can be configured
+
+![Screenshot of the add dialog](screenshots/QidiPrint_AddPrinter.png)
 
 * Choose your printer and press the "Connect" button
 * Click "Close"
