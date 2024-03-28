@@ -35,13 +35,6 @@ With Cura not running, unpack the zip file from the
   * MacOS: `~/Library/Application Support/Cura/5.2.1/`
   * Linux: `/home/<username>/.local/share/cura/5.2.1/`
 
-If you have the other Qidi printer model (not X-CF Pro), unpack the [Qidi Printer Definitions.zip](https://github.com/alkaes/Qidi-Printer-Definitions/releases/download/1.0/Qidi-Printer-Definitions.v1.0.zip) to this specific folder:
-  * Windows: `%USERPROFILE%\AppData\Roaming\cura\5.2.1\`
-  * MacOS: `~/Library/Application Support/Cura/5.2.1/`
-  * Linux: `/home/<username>/.local/share/cura/5.2.1/`
-
-The plugin compatibility with the other QIDI printers is not tested, but hopefully it will work.
-
 ## Configuration
 
 **Do NOT try to add a new "networked printer"!** This is only for Ultimaker printers.
