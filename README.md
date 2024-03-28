@@ -17,8 +17,6 @@ Should be working with the following printers, their definitions have been aggre
 
 __Plugin has up to date only been tested using Cura 5.6.0 on Microsoft Windows printing to a Qidi X-Max.__
 
-## ToBeUpdated
-
 ## Print menu button
 ![Screenshot of the printer menu entry](screenshots/SendToXMAX.png)
 ## Printer Monitor (idle)
